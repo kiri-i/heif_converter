@@ -1,16 +1,15 @@
 from PIL import Image
 import pyheif
 import pathlib
+import fire
+from tqdm import tqdm
 
-
-def conv(heic_path, save_dir):
-    # ファイルの親ディレクトリを取得
-    label_dir = heic_path.parent.name
+def conv(heic_path, save_dir, filetype, quality):
     # 保存先のディレクトリとファイル名
-    save_path = save_dir / label_dir / pathlib.Path(heic_path.name).with_suffix(".jpg")
+    extension = "." + filetype
+    save_path = save_dir / filetype / pathlib.Path(*heic_path.parts[2:]).with_suffix(extension)
     # フォルダ作成
     save_path.parent.mkdir(parents=True, exist_ok=True)
-
     # HEICファイルpyheifで読み込み
     heif_file = pyheif.read(heic_path)
     # 読み込んだファイルの中身をdata変数へ
@@ -23,22 +22,20 @@ def conv(heic_path, save_dir):
         heif_file.stride,
         )
     # JPEGで保存
-    data.save(save_path, quality=95)
+    data.save(save_path, quality=quality)
     print("保存：",save_path)
 
-
-def main():
+def conv_files(input_dir="./input", output_dir="./output", filetype="jpg",quality=95):
     # 変換対象のファイルがあるディレクトリ
-    image_dir = pathlib.Path("./images/heic")
+    image_dir = pathlib.Path(input_dir)
     # 保存先のディレクトリ
-    save_dir = pathlib.Path("./images/jpg")
-
+    save_dir = pathlib.Path(output_dir)
     # globでディレクトリ内のHEICファイルをリストで取得
     heic_paths = list(image_dir.glob('**/*.heic'))
 
-    for heic_path in heic_paths:
-        conv(heic_path, save_dir)
+    for heic_path in tqdm(heic_paths):
+        conv(heic_path, save_dir, filetype, quality)
     print("完了")
 
 if __name__ == "__main__":
-    main()
+    fire.Fire(conv_files)
