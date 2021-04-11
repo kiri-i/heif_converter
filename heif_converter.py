@@ -7,7 +7,7 @@ from tqdm import tqdm
 def conv(heic_path, save_dir, filetype, quality):
     # 保存先のディレクトリとファイル名
     extension = "." + filetype
-    save_path = save_dir / filetype / pathlib.Path(*heic_path.parts[2:]).with_suffix(extension)
+    save_path = save_dir / filetype / pathlib.Path(*heic_path.parts[1:]).with_suffix(extension)
     # フォルダ作成
     save_path.parent.mkdir(parents=True, exist_ok=True)
     # HEICファイルpyheifで読み込み
@@ -25,7 +25,7 @@ def conv(heic_path, save_dir, filetype, quality):
     data.save(save_path, quality=quality)
     print("保存：",save_path)
 
-def conv_files(input_dir="./input", output_dir="./output", filetype="jpg",quality=95):
+def conv_files(input_dir="input", output_dir="output", filetype="jpg",quality=95):
     # 変換対象のファイルがあるディレクトリ
     image_dir = pathlib.Path(input_dir)
     # 保存先のディレクトリ
